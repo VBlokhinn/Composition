@@ -17,11 +17,11 @@ import com.example.composition.domain.entity.Level
 class GameFragment : Fragment() {
 
     private lateinit var level: Level
+    private val viewModelFactory by lazy {
+        GameViewModelFactory(level, requireActivity().application)
+    }
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        )[MainViewModel::class.java]
+        ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }
 
     private val tvOptions by lazy {
@@ -58,12 +58,11 @@ class GameFragment : Fragment() {
         binding.tvSum.text = viewModel.question.toString()
         observeViewModel()
         setClickListenersToOptions()
-        viewModel.startGame(level)
     }
 
     private fun setClickListenersToOptions() {
         for (tvOption in tvOptions) {
-            tvOption.setOnClickListener{
+            tvOption.setOnClickListener {
                 viewModel.chooseAnswer(tvOption.text.toString().toInt())
             }
         }
@@ -106,7 +105,7 @@ class GameFragment : Fragment() {
         _binding = null
     }
 
-    private fun getColorByState(goodState: Boolean) : Int {
+    private fun getColorByState(goodState: Boolean): Int {
         val colorResId = if (goodState) {
             android.R.color.holo_green_light
         } else {
